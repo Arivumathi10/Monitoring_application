@@ -1,25 +1,50 @@
-# Security notes (Phase 0–1)
+# Security notes
 
 ## Secrets and config
-- `SECRET_KEY`, `ADMIN_USERNAME`, and `ADMIN_PASSWORD_HASH` come from `.env` only.
+- `SECRET_KEY`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, and `SERVERS_KEY` come from `.env` only.
 - `.env` is gitignored; commit `.env.example` with empty placeholders.
-- Never store plaintext passwords — only Werkzeug password hashes.
+- Never store plaintext admin passwords — only Werkzeug hashes.
+- SSH passwords in `servers.json` are Fernet-encrypted using key material from `SERVERS_KEY`. Keep the file mode `0600` when possible (`ServerStore` attempts this).
 
-## Authentication threat model
-- Failed logins always show the same message: “Invalid username or password” (no user enumeration).
-- Username compared with `hmac.compare_digest` (constant-time).
-- Password verified with `check_password_hash` (salted scrypt/pbkdf2).
-- Empty and oversized inputs are rejected before hashing (DoS bound: username ≤ 128, password ≤ 512).
-- Unconfigured credentials (`ADMIN_*` missing) cause every login to fail closed.
+## Authentication
+- Failed logins always show the same message (no user enumeration).
+- Username compared with `hmac.compare_digest`; password via `check_password_hash`.
+- Empty/oversized inputs rejected (username ≤ 128, password ≤ 512).
+- Session regenerated on login; cleared on logout.
+- `SESSION_COOKIE_HTTPONLY`; `SESSION_COOKIE_SECURE` in production; 30-minute idle lifetime.
 
-## Sessions
-- Flask-Session filesystem store with signed cookies (`SESSION_USE_SIGNER`).
-- `SESSION_COOKIE_HTTPONLY=True` (not readable from JS).
-- `SESSION_COOKIE_SECURE=True` in production (HTTPS only).
-- Idle lifetime: 30 minutes (`PERMANENT_SESSION_LIFETIME`).
-- On successful login the session is cleared then re-created (fixation mitigation).
-- Logout calls `session.clear()`.
+## CSRF and headers
+- Flask-WTF CSRFProtect on state-changing routes (login POST, server CRUD/test).
+- HTML forms include `csrf_token`; JS APIs send `X-CSRFToken`.
+- Headers: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, CSP (`default-src 'self'`), HSTS when not in debug.
 
-## Templates
-- Jinja auto-escapes output; do not use `|safe` for user-controlled data.
-- Password fields are never echoed back into the page.
+## Monitoring APIs
+- All `/api/stats*` routes require login.
+- Process list exposes name/pid/cpu/mem only — not full command lines or env.
+- Rate limiting is not enforced in-app yet; put a reverse proxy limit in front for production.
+- Stats GET is read-only; CSRF applies to state-changing POSTs/PUTs/DELETEs.
+
+## Remote SSH
+- Commands are fixed allowlists in code (`LINUX_COMMANDS` / `WINDOWS_COMMANDS`). User fields never enter the shell string.
+- Host key policy prefers system `known_hosts` + `RejectPolicy`, with AutoAdd fallback for lab demos.
+- Metadata IP `169.254.169.254` and loopback targets are blocked.
+- Residual risk: private LAN targets remain allowed (needed for monitoring). Do not expose this app to the public internet without additional controls.
+- Client-facing remote errors are generic (`Unable to collect remote stats`).
+
+## Test connection
+- `/api/servers/test` performs a short TCP connect only (timeout ~3s). It does **not** authenticate SSH or run commands.
+
+## Production
+- `ProductionConfig`: `DEBUG=False`, secure cookies.
+- Do not use `python run.py` in production — use Gunicorn behind HTTPS termination.
+- CI runs `pip-audit` and fails on known vulnerable dependencies.
+
+## Checklist
+- [x] Secrets only via env / gitignored `.env`
+- [x] Password hashes only
+- [x] CSRF on mutating forms/APIs
+- [x] Security headers
+- [x] Auth on stats + server routes
+- [x] Encrypted SSH passwords at rest
+- [x] Allowlisted remote commands
+- [x] CI lint + tests + dependency audit

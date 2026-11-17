@@ -4,6 +4,11 @@ __pycache__/
 *.pyc
 *.pyo
 flask_session/
+app/servers.json
+servers.json
+app/servers.json
+servers.json
+
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/

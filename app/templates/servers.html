@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Servers — System Monitor{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>Server inventory</h1>
+    <p>Add SSH targets. Passwords are encrypted at rest. Test connection is a TCP probe only.</p>
+</section>
+
+<section class="panel">
+    <h2>Add server</h2>
+    <form method="POST" action="{{ url_for('servers.add_server_form') }}" class="auth-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input id="name" name="name" maxlength="128">
+        </div>
+        <div class="form-group">
+            <label for="host">Host</label>
+            <input id="host" name="host" required maxlength="253">
+        </div>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input id="username" name="username" required maxlength="128">
+        </div>
+        <div class="form-group">
+            <label for="password">SSH password</label>
+            <input id="password" name="password" type="password" maxlength="512">
+        </div>
+        <div class="form-group">
+            <label for="port">Port</label>
+            <input id="port" name="port" type="number" value="22" min="1" max="65535">
+        </div>
+        <div class="form-group">
+            <label for="os_type">OS</label>
+            <select id="os_type" name="os_type">
+                <option value="linux" {% if os_type == 'linux' %}selected{% endif %}>Linux</option>
+                <option value="windows" {% if os_type == 'windows' %}selected{% endif %}>Windows</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Add</button>
+        <button type="button" class="btn btn-muted" id="test-btn">Test TCP</button>
+    </form>
+    <p id="test-result" class="muted"></p>
+</section>
+
+<section class="panel">
+    <h2>Servers ({{ os_type }})</h2>
+    <p>
+        <a href="{{ url_for('servers.index', os_type='linux') }}">Linux</a> ·
+        <a href="{{ url_for('servers.index', os_type='windows') }}">Windows</a>
+    </p>
+    {% if servers %}
+    <table class="data-table">
+        <thead><tr><th>Name</th><th>Host</th><th>User</th><th>Port</th><th></th></tr></thead>
+        <tbody>
+        {% for s in servers %}
+            <tr>
+                <td>{{ s.name }}</td>
+                <td>{{ s.host }}</td>
+                <td>{{ s.username }}</td>
+                <td>{{ s.port }}</td>
+                <td>
+                    <a class="btn" href="{{ url_for('dashboard.monitor_remote', host=s.host) }}">Monitor</a>
+                    <button class="btn btn-muted delete-btn" data-host="{{ s.host }}">Delete</button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="muted">No servers for this OS type.</p>
+    {% endif %}
+</section>
+
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<script src="{{ url_for('static', filename='js/servers.js') }}"></script>
+{% endblock %}

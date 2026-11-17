@@ -3,7 +3,34 @@
 {% block content %}
 <section class="hero">
     <h1>Dashboard</h1>
-    <p>You are signed in as <strong>{{ session.get('username') }}</strong>.</p>
-    <p>Monitoring features arrive in later phases. This page confirms session auth works.</p>
+    <p>Signed in as <strong>{{ session.get('username') }}</strong>.</p>
+    <p>
+        <a class="btn" href="{{ url_for('dashboard.monitor_local') }}">Monitor this host</a>
+        <a class="btn btn-muted" href="{{ url_for('servers.index') }}">Manage servers</a>
+    </p>
+</section>
+
+<section class="panel">
+    <h2>Configured servers</h2>
+    {% if servers %}
+    <table class="data-table">
+        <thead>
+            <tr><th>Name</th><th>Host</th><th>OS</th><th>Port</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for s in servers %}
+            <tr>
+                <td>{{ s.name }}</td>
+                <td>{{ s.host }}</td>
+                <td>{{ s.os_type }}</td>
+                <td>{{ s.port }}</td>
+                <td><a class="btn" href="{{ url_for('dashboard.monitor_remote', host=s.host) }}">Monitor</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="muted">No remote servers yet. Add one from Manage servers.</p>
+    {% endif %}
 </section>
 {% endblock %}

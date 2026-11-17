@@ -92,126 +92,126 @@ Incremental checklist for AI-assisted development. Complete items **in order**. 
 ## Phase 2 — CI/CD (GitHub Actions)
 
 ### 2.1 Lint/format baseline (tiny)
-- [ ] Add a minimal lint config (e.g. ruff) or document `python -m compileall`
-- [ ] **Security:** Fail CI on obvious secret patterns if a scanner is added later; for now ensure `.env` cannot be committed
-- [ ] **Docs:** Document local lint command in README
+- [x] Add a minimal lint config (e.g. ruff) or document `python -m compileall`
+- [x] **Security:** Fail CI on obvious secret patterns if a scanner is added later; for now ensure `.env` cannot be committed
+- [x] **Docs:** Document local lint command in README
 
 ### 2.2 GitHub Actions — test workflow
-- [ ] Add `.github/workflows/ci.yml`: install deps, run pytest on push/PR
-- [ ] Use Python 3.11+ matrix (single version is fine initially)
-- [ ] Inject dummy `SECRET_KEY` / admin test credentials via workflow `env` (not repository secrets of real prod)
-- [ ] **Security:** No real secrets in workflow files; use ephemeral CI env values only
-- [ ] **Docs:** Add “CI” section describing when checks run and how to read failures
+- [x] Add `.github/workflows/ci.yml`: install deps, run pytest on push/PR
+- [x] Use Python 3.11+ matrix (single version is fine initially)
+- [x] Inject dummy `SECRET_KEY` / admin test credentials via workflow `env` (not repository secrets of real prod)
+- [x] **Security:** No real secrets in workflow files; use ephemeral CI env values only
+- [x] **Docs:** Add “CI” section describing when checks run and how to read failures
 
 ### 2.3 GitHub Actions — quality gate
-- [ ] Extend CI to run lint/compile step before tests
-- [ ] Mark workflow required for merges (document the GitHub branch-protection click-path)
-- [ ] **Security:** CI must fail if tests fail; do not `continue-on-error` for auth tests
-- [ ] **Docs:** Update README with badge or link to Actions (optional)
+- [x] Extend CI to run lint/compile step before tests
+- [x] Mark workflow required for merges (document the GitHub branch-protection click-path)
+- [x] **Security:** CI must fail if tests fail; do not `continue-on-error` for auth tests
+- [x] **Docs:** Update README with badge or link to Actions (optional)
 
 ### 2.4 Phase 2 definition of done
-- [ ] Opening a PR runs CI; auth tests must pass to go green
+- [x] Opening a PR runs CI; auth tests must pass to go green
 
 ---
 
 ## Phase 3 — Local host monitoring (read-only)
 
 ### 3.1 Monitor interface
-- [ ] Add `base_monitor.py` abstract interface (stats shape: CPU, memory, disk, network, processes)
-- [ ] **Security:** Define which fields are safe to expose in the UI (no env vars, no file contents)
-- [ ] **Docs:** Document stats JSON schema in `docs/architecture.md`
+- [x] Add `base_monitor.py` abstract interface (stats shape: CPU, memory, disk, network, processes)
+- [x] **Security:** Define which fields are safe to expose in the UI (no env vars, no file contents)
+- [x] **Docs:** Document stats JSON schema in `docs/architecture.md`
 
 ### 3.2 Local collector
-- [ ] Add local monitor service using `psutil`
-- [ ] Wire `/api/stats` (auth-required) returning `jsonify(...)`
-- [ ] **Security:** Require login for all stats APIs; rate-limit note in docs; avoid leaking full process command lines if sensitive
-- [ ] **Docs:** Example API response in docs
+- [x] Add local monitor service using `psutil`
+- [x] Wire `/api/stats` (auth-required) returning `jsonify(...)`
+- [x] **Security:** Require login for all stats APIs; rate-limit note in docs; avoid leaking full process command lines if sensitive
+- [x] **Docs:** Example API response in docs
 
 ### 3.3 Dashboard UI
-- [ ] Dashboard page that polls `/api/stats`
-- [ ] Minimal JS fetch + render (keep JS small)
-- [ ] **Security:** Credentials never stored in JS; rely on session cookie; CSRF strategy documented for state-changing routes (stats GET is read-only)
-- [ ] **Docs:** Screenshot or short “using the dashboard” blurb in README
+- [x] Dashboard page that polls `/api/stats`
+- [x] Minimal JS fetch + render (keep JS small)
+- [x] **Security:** Credentials never stored in JS; rely on session cookie; CSRF strategy documented for state-changing routes (stats GET is read-only)
+- [x] **Docs:** Screenshot or short “using the dashboard” blurb in README
 
 ### 3.4 Tests
-- [ ] Unit test: unauthenticated `/api/stats` → redirect/401
-- [ ] Unit test: authenticated client receives expected keys (mock psutil if needed)
-- [ ] **Security:** Assert no password/hash fields appear in JSON
-- [ ] **Docs:** Note test coverage for monitoring APIs
+- [x] Unit test: unauthenticated `/api/stats` → redirect/401
+- [x] Unit test: authenticated client receives expected keys (mock psutil if needed)
+- [x] **Security:** Assert no password/hash fields appear in JSON
+- [x] **Docs:** Note test coverage for monitoring APIs
 
 ---
 
 ## Phase 4 — Server inventory (CRUD, no remote exec yet)
 
 ### 4.1 Encrypted server store
-- [ ] Add `server_store.py` persisting to local JSON (or similar)
-- [ ] Encrypt stored SSH passwords at rest (e.g. Fernet) using a key derived/configured from env
-- [ ] **Security:** Never log passwords; encrypt at rest; key only in env; file permissions guidance
-- [ ] **Docs:** Document `SERVERS_KEY` / encryption in `.env.example` and `docs/security.md`
+- [x] Add `server_store.py` persisting to local JSON (or similar)
+- [x] Encrypt stored SSH passwords at rest (e.g. Fernet) using a key derived/configured from env
+- [x] **Security:** Never log passwords; encrypt at rest; key only in env; file permissions guidance
+- [x] **Docs:** Document `SERVERS_KEY` / encryption in `.env.example` and `docs/security.md`
 
 ### 4.2 Servers UI + API
-- [ ] List / add / edit / delete server forms (host, user, port, OS type)
-- [ ] Thin `servers` blueprint; logic in service layer
-- [ ] **Security:** Auth required for all server routes; validate host/port input; do not reflect unsanitized host into HTML unsafely
-- [ ] **Docs:** Update architecture with servers module
+- [x] List / add / edit / delete server forms (host, user, port, OS type)
+- [x] Thin `servers` blueprint; logic in service layer
+- [x] **Security:** Auth required for all server routes; validate host/port input; do not reflect unsanitized host into HTML unsafely
+- [x] **Docs:** Update architecture with servers module
 
 ### 4.3 Connection test stub
-- [ ] Add “test connection” endpoint that validates input only (or shallow TCP check) before full SSH
-- [ ] **Security:** Timeouts; no unbounded connection attempts; do not return raw exception strings to clients
-- [ ] **Docs:** Document what “test connection” does and does not do
+- [x] Add “test connection” endpoint that validates input only (or shallow TCP check) before full SSH
+- [x] **Security:** Timeouts; no unbounded connection attempts; do not return raw exception strings to clients
+- [x] **Docs:** Document what “test connection” does and does not do
 
 ### 4.4 Tests + docs
-- [ ] Unit tests for store encrypt/decrypt round-trip and CRUD authz
-- [ ] **Security:** Tests use ephemeral keys; temp files cleaned up
-- [ ] **Docs:** Operator guide: adding a server
+- [x] Unit tests for store encrypt/decrypt round-trip and CRUD authz
+- [x] **Security:** Tests use ephemeral keys; temp files cleaned up
+- [x] **Docs:** Operator guide: adding a server
 
 ---
 
 ## Phase 5 — Remote monitoring over SSH
 
 ### 5.1 Remote monitor service
-- [ ] Add `remote_monitor.py` using Paramiko with strict timeouts
-- [ ] OS-specific command sets (Linux shell / Windows PowerShell) behind clear allowlists
-- [ ] **Security:** Command allowlist only (no user-supplied shell strings); host key policy documented (prefer known_hosts); reject SSRF-prone targets where practical (metadata IPs) and document residual risk
-- [ ] **Docs:** Threat notes for SSH remote exec in `docs/security.md`
+- [x] Add `remote_monitor.py` using Paramiko with strict timeouts
+- [x] OS-specific command sets (Linux shell / Windows PowerShell) behind clear allowlists
+- [x] **Security:** Command allowlist only (no user-supplied shell strings); host key policy documented (prefer known_hosts); reject SSRF-prone targets where practical (metadata IPs) and document residual risk
+- [x] **Docs:** Threat notes for SSH remote exec in `docs/security.md`
 
 ### 5.2 Remote stats API + monitor page
-- [ ] `/api/stats/<host>` and monitor template for a selected server
-- [ ] **Security:** Auth required; authorize that `<host>` exists in the user’s server store; generic errors to client
-- [ ] **Docs:** Update API table
+- [x] `/api/stats/<host>` and monitor template for a selected server
+- [x] **Security:** Auth required; authorize that `<host>` exists in the user’s server store; generic errors to client
+- [x] **Docs:** Update API table
 
 ### 5.3 Tests
-- [ ] Mock SSH layer; test allowlist and auth wrappers
-- [ ] **Security:** Ensure tests prove arbitrary commands cannot be injected via host name/fields
-- [ ] **Docs:** How to run remote-monitor tests offline (mocks)
+- [x] Mock SSH layer; test allowlist and auth wrappers
+- [x] **Security:** Ensure tests prove arbitrary commands cannot be injected via host name/fields
+- [x] **Docs:** How to run remote-monitor tests offline (mocks)
 
 ---
 
 ## Phase 6 — Hardening and production readiness
 
 ### 6.1 Production config
-- [ ] ProductionConfig: `DEBUG=False`; secure cookie flags; document Gunicorn invocation
-- [ ] Remove or gate any `app.run(debug=True)` for prod paths
-- [ ] **Security:** Confirm debug debugger cannot be enabled in prod
-- [ ] **Docs:** “Deploying” section (Gunicorn, env vars, HTTPS termination)
+- [x] ProductionConfig: `DEBUG=False`; secure cookie flags; document Gunicorn invocation
+- [x] Remove or gate any `app.run(debug=True)` for prod paths
+- [x] **Security:** Confirm debug debugger cannot be enabled in prod
+- [x] **Docs:** “Deploying” section (Gunicorn, env vars, HTTPS termination)
 
 ### 6.2 Security headers and CSRF
-- [ ] Add basic security headers (or Flask-Talisman-style) for HTML routes
-- [ ] CSRF protection on state-changing forms (login, server CRUD)
-- [ ] **Security:** Verify login + servers POST reject missing/invalid CSRF tokens
-- [ ] **Docs:** Update `docs/security.md` checklist
+- [x] Add basic security headers (or Flask-Talisman-style) for HTML routes
+- [x] CSRF protection on state-changing forms (login, server CRUD)
+- [x] **Security:** Verify login + servers POST reject missing/invalid CSRF tokens
+- [x] **Docs:** Update `docs/security.md` checklist
 
 ### 6.3 CI hardening
-- [ ] Add dependency audit step (e.g. `pip-audit`) to GitHub Actions
-- [ ] Optional: secret scanning / `gitleaks` in CI
-- [ ] **Security:** CI fails on known vulnerable deps (document exceptions)
-- [ ] **Docs:** Describe audit job in README CI section
+- [x] Add dependency audit step (e.g. `pip-audit`) to GitHub Actions
+- [x] Optional: secret scanning / `gitleaks` in CI
+- [x] **Security:** CI fails on known vulnerable deps (document exceptions)
+- [x] **Docs:** Describe audit job in README CI section
 
 ### 6.4 Final documentation pass
-- [ ] README: quickstart, auth, dashboard, servers, remote monitor, CI, deploy
-- [ ] `docs/architecture.md` matches final layout
-- [ ] `docs/security.md` complete checklist
-- [ ] Mark completed items in this file as you finish them
+- [x] README: quickstart, auth, dashboard, servers, remote monitor, CI, deploy
+- [x] `docs/architecture.md` matches final layout
+- [x] `docs/security.md` complete checklist
+- [x] Mark completed items in this file as you finish them
 
 ---
 
@@ -236,3 +236,4 @@ Work **one checkbox group** (e.g. `1.2` or `2.2`) per agent session. Do not comb
 | Date | Step | Notes |
 |------|------|-------|
 | 2026-11-17 | Phase 0–1 | Scaffold, auth, sessions, pytest; local `.env` uses admin/admin123 (dev only) |
+| 2026-11-17 | Phase 2–6 | CI, local/remote monitoring, server inventory, hardening, docs |

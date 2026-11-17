@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Monitor {{ host }} — System Monitor{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>Monitor: {{ host }}</h1>
+    <p class="muted">Type: {{ system_type }} · refreshes every 5s via session cookie (no credentials in JS)</p>
+    <p id="status">Loading…</p>
+</section>
+
+<section class="stats-grid">
+    <div class="stat-card"><h3>CPU</h3><pre id="cpu">—</pre></div>
+    <div class="stat-card"><h3>Memory</h3><pre id="memory">—</pre></div>
+    <div class="stat-card"><h3>Disk</h3><pre id="disk">—</pre></div>
+    <div class="stat-card"><h3>Network</h3><pre id="network">—</pre></div>
+    <div class="stat-card wide"><h3>Processes</h3><pre id="processes">—</pre></div>
+</section>
+
+<script>
+  window.MONITOR_HOST = {{ host|tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/monitor.js') }}"></script>
+{% endblock %}

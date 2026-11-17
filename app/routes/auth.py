@@ -8,6 +8,8 @@ from flask import (
     session,
     url_for,
 )
+from flask_wtf.csrf import validate_csrf
+from wtforms.validators import ValidationError
 
 from app.services.auth_service import verify_credentials
 
@@ -20,11 +22,17 @@ def login():
         return redirect(url_for("dashboard.index"))
 
     if request.method == "POST":
+        if current_app.config.get("WTF_CSRF_ENABLED", True):
+            try:
+                validate_csrf(request.form.get("csrf_token"))
+            except ValidationError:
+                flash("Invalid CSRF token", "error")
+                return redirect(url_for("auth.login"))
+
         username = request.form.get("username", "")
         password = request.form.get("password", "")
 
         if verify_credentials(username, password):
-            # Regenerate session to reduce fixation risk.
             session.clear()
             session["logged_in"] = True
             session["username"] = current_app.config.get("ADMIN_USERNAME")
