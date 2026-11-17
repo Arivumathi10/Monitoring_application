@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — System Monitor{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>Dashboard</h1>
+    <p>You are signed in as <strong>{{ session.get('username') }}</strong>.</p>
+    <p>Monitoring features arrive in later phases. This page confirms session auth works.</p>
+</section>
+{% endblock %}

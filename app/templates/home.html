@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Home — System Monitor{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>System Monitor</h1>
+    <p>Local and remote host monitoring with secure admin sign-in.</p>
+    <p>
+        <a class="btn" href="{{ url_for('auth.login') }}">Sign in</a>
+    </p>
+</section>
+{% endblock %}
